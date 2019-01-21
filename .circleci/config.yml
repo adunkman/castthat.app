@@ -25,6 +25,20 @@ jobs:
           paths:
             - node_modules
 
+  eslint:
+    executor: app
+    steps:
+      - checkout
+      - attach_workspace: {at: .}
+      - run: npm run eslint
+
+  stylelint:
+    executor: app
+    steps:
+      - checkout
+      - attach_workspace: {at: .}
+      - run: npm run stylelint
+
   pa11y:
     executor: app
     steps:
@@ -49,8 +63,12 @@ workflows:
     jobs:
       - build
       - pa11y: {requires: [build]}
+      - eslint: {requires: [build]}
+      - stylelint: {requires: [build]}
       - deploy:
           requires:
             - build
+            - eslint
+            - stylelint
             - pa11y
           filters: {branches: {only: master}}
