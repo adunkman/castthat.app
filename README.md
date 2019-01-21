@@ -1,5 +1,9 @@
 # CastThat.app
 
+[![Build Status](https://img.shields.io/circleci/project/github/adunkman/castthat.app/master.svg)](https://circleci.com/gh/adunkman/workflows/castthat.app)
+[![Dependency Status](https://img.shields.io/librariesio/github/adunkman/castthat.app.svg)](https://libraries.io/github/adunkman/castthat.app)
+[![Maintainability Status](https://img.shields.io/codeclimate/maintainability/adunkman/castthat.app.svg)](https://codeclimate.com/github/adunkman/castthat.app)
+
 Cast dashboards at any URL to your TV non-interactively without tab mirroring.
 
 ## Configuring for Development
