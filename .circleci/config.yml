@@ -1,0 +1,56 @@
+version: 2.1
+orbs: {aws-s3: circleci/aws-s3@1.0.3}
+
+executors:
+  app:
+    docker: [image: circleci/node:10.15]
+  deploy:
+    docker: [image: circleci/python:2.7]
+
+jobs:
+  build:
+    executor: app
+    steps:
+      - checkout
+      - restore_cache:
+          key: v1-dependencies-{{ checksum "package-lock.json" }}
+      - run: npm ci
+      - save_cache:
+          key: v1-dependencies-{{ checksum "package-lock.json" }}
+          paths:
+            - ~/.npm
+      - store_artifacts: {path: dist}
+      - persist_to_workspace:
+          root: .
+          paths:
+            - node_modules
+
+  pa11y:
+    executor: app
+    steps:
+      - checkout
+      - attach_workspace: {at: .}
+      - run: npm run pa11y
+
+  deploy:
+    executor: deploy
+    steps:
+      - checkout
+      - attach_workspace: {at: .}
+      - aws-s3/sync:
+          from: dist
+          to: s3://www.castthat.app/
+          arguments: --acl public-read
+          overwrite: true
+
+workflows:
+  version: 2
+  build-test-deploy:
+    jobs:
+      - build
+      - pa11y: {requires: [build]}
+      - deploy:
+          requires:
+            - build
+            - pa11y
+          filters: {branches: {only: master}}
